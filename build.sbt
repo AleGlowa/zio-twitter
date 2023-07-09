@@ -15,3 +15,7 @@ lazy val root =
     .settings(commonSettings)
 
 addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt;scalafixAll")
+addCommandAlias(
+  "check",
+  ";scalafmtCheckAll;scalafmtSbtCheck;scalafixAll --check"
+)
