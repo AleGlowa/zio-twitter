@@ -1,5 +1,17 @@
-ThisBuild / name := "zio-twitter"
-ThisBuild / version := "0.1"
-ThisBuild / scalaVersion := "3.3.0"
+import Settings.*
 
-lazy val root = project in file(".")
+inThisBuild(
+  Seq(
+    name              := "zio-twitter",
+    version           := "0.1",
+    scalaVersion      := "3.3.0",
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision
+  )
+)
+
+lazy val root =
+  (project in file("."))
+    .settings(commonSettings)
+
+addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt;scalafixAll")
