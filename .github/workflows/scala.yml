@@ -34,14 +34,6 @@ jobs:
     - name: Check the code format
       run: sbt check
 
-  compile:
-    needs: check-format
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Compile the code
-      run: sbt compile
-
   test:
     needs: compile
     runs-on: ubuntu-latest
