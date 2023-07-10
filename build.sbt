@@ -10,9 +10,19 @@ inThisBuild(
   )
 )
 
+lazy val boot =
+  project
+    .dependsOn(domain)
+    .settings(bootSettings)
+    .settings(libraryDependencies ++= bootDependencies)
+
+lazy val domain =
+  project
+    .settings(commonSettings)
+
 lazy val root =
   (project in file("."))
-    .settings(commonSettings)
+    .aggregate(boot, domain)
 
 addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt;scalafixAll")
 addCommandAlias(
