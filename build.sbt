@@ -14,11 +14,12 @@ lazy val boot =
   project
     .dependsOn(domain)
     .settings(bootSettings)
-    .settings(libraryDependencies ++= bootDependencies)
+    .settings(libraryDependencies ++= commonDependencies)
 
 lazy val domain =
   project
     .settings(commonSettings)
+    .settings(libraryDependencies ++= commonDependencies)
 
 lazy val root =
   (project in file("."))

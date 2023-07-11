@@ -1,10 +1,9 @@
 import sbt.Keys.*
-import sbt.Compile
+import sbt.{Compile, TestFramework}
 import scalafix.sbt.ScalafixPlugin.autoImport.scalafixOnCompile
 
-import Libs.*
-
 object Settings {
+  import Libs.*
 
   val bootSettings =
     Seq(
@@ -18,8 +17,9 @@ object Settings {
     Seq(
       scalacOptions     :=
         Seq("-unchecked", "-deprecation", "-feature"),
-      scalafixOnCompile := true
+      scalafixOnCompile := true,
+      testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
     )
 
-  val bootDependencies = zio :: Nil
+  val commonDependencies = zio :: zioHttp :: zioTest :: zioTestSbt :: Nil
 }
