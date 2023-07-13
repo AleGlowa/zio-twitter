@@ -2,7 +2,6 @@ package zio.twitter.application.scraper
 
 import zio.http.Header.UserAgent
 import zio.test.*
-import zio.twitter.application.scraper.Utils.randUserAgent
 
 import scala.util.Random
 
