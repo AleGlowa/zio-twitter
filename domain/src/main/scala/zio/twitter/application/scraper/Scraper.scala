@@ -1,26 +1,29 @@
 package zio.twitter.application.scraper
 
-import zio.Duration
-import zio.Schedule
-import zio.ZLayer
-import zio.durationInt
+import zio.*
 import zio.http.Header.UserAgent
 import zio.http.*
 import zio.http.netty.NettyConfig
 
 trait Scraper:
 
-  val name: String
-  private val connRetries: Int = 3
+  protected val name: String
+  protected val connRetries: Int = 3
 
   def getItems: List[String]
+
+  protected def get(url: URL, headers: Headers): Task[Response] =
+    request(Method.GET, url, Body.empty, headers)
+
+  protected def post(url: URL, body: Body, headers: Headers): Task[Response] =
+    request(Method.POST, url, body, headers)
 
   private def request(
     method: Method,
     url: URL,
     body: Body,
     headers: Headers,
-    proxy: Proxy,
+    proxy: Proxy = Proxy.empty,
     timeout: Duration = 10.seconds
   ) =
     val headersWithUserAgent =
