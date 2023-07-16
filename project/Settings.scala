@@ -21,5 +21,6 @@ object Settings {
       testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
     )
 
-  val commonDependencies = zio :: zioHttp :: zioTest :: zioTestSbt :: Nil
+  val commonDependencies =
+    zio :: zioHttp :: zioPrelude :: zioJson :: zioTest :: zioTestSbt :: Nil
 }

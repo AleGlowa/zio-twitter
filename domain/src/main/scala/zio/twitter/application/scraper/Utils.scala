@@ -1,10 +1,48 @@
 package zio.twitter.application.scraper
 
+import zio.Duration
+import zio.NonEmptyChunk
+import zio.durationInt
+import zio.http.Header.AcceptLanguage.Multiple
+import zio.http.Header.AcceptLanguage.Single
+import zio.http.Header.Authorization
+import zio.http.Header.Referer
 import zio.http.Header.UserAgent
 import zio.http.Header.UserAgent.*
+import zio.http.Headers
+import zio.http.URL
 
 import java.time.LocalDate
 import scala.util.Random
+
+private[scraper] object TwitterUtils:
+  private val ApiAuthorizationHeaderValue =
+    "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+
+  def getHeaders(baseUrl: URL): Headers =
+    Headers(
+      Authorization.Bearer(ApiAuthorizationHeaderValue),
+      Referer(baseUrl),
+      Multiple(
+        NonEmptyChunk(Single("en-US", Some(0.5)), Single("en", Some(0.5)))
+      )
+    )
+
+  enum TwitterSearchScraperMode:
+    case Live, Top, User
+
+  enum TwitterApiType:
+    case GraphQL
+
+  enum ScrollDirection:
+    case Top, Bottom, Both
+
+  final case class GuestTokenManager(
+    token: Option[String] = None,
+    setTime: Duration = 0.seconds
+  ):
+    def reset: GuestTokenManager = copy(token = None, setTime = 0.seconds)
+end TwitterUtils
 
 def randUserAgent: UserAgent =
   val version = lerp(
