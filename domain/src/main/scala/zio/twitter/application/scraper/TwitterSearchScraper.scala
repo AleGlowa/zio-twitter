@@ -1,14 +1,9 @@
 package zio.twitter.application.scraper
 
-import zio.RIO
-import zio.URIO
-import zio.ZIO
-import zio.ZState
-import zio.duration2DurationOps
-import zio.durationInt
+import zio.*
 import zio.http.Header.Custom
 import zio.http.Header.SetCookie
-import zio.http.Header.{Cookie => HCookie}
+import zio.http.Header.Cookie as HCookie
 import zio.http.*
 import zio.json.DecoderOps
 import zio.json.ast.Json
@@ -54,10 +49,10 @@ final class TwitterSearchScraper(
   def getHeadersWithGuestToken: RIO[ZState[State], Headers] =
     val getGuestTokenManager =
       for
-        resp <- get(url, headers)
-        text <- resp.body.asString
-        gt   <- retrieveGuestTokenManager(text, resp.headers.get(HCookie))
-      yield gt
+        resp      <- get(url, headers)
+        text      <- resp.body.asString
+        gtManager <- retrieveGuestTokenManager(text, resp.headers.get(HCookie))
+      yield gtManager
     for
       gtManager    <- ZIO.getStateWith[State](_.guestTokenManager)
       newGtManager <- getGuestTokenManager.when(gtManager.token.isEmpty)
@@ -98,6 +93,9 @@ final class TwitterSearchScraper(
     yield gtManager
 
 object TwitterSearchScraper:
+  // Later: Remove
+  def getHeadersWithGuestToken   =
+    ZIO.service[TwitterSearchScraper].flatMap(_.getHeadersWithGuestToken)
   private val GuestTokenRegex    =
     """document.cookie = decodeURIComponent\("gt=(\d+); Max-Age=10800; Domain=.twitter.com; Path=/; Secure"\)""".r
   private val GuestTokenValidity = 10800.seconds
@@ -105,16 +103,16 @@ object TwitterSearchScraper:
   // Later: Change from public to private
   final case class State(guestTokenManager: GuestTokenManager)
 
-  private def gtCookie(gt: GuestTokenManager) =
+  private def gtCookie(gtManager: GuestTokenManager) =
     SetCookie(
       Cookie.Response(
         "gt",
-        gt.token.get,
+        gtManager.token.get,
         Some(".twitter.com"),
         Some(Path.root),
         isSecure = true,
-        maxAge = Some(gt.setTime + GuestTokenValidity)
+        maxAge = Some(gtManager.setTime + GuestTokenValidity)
       )
     )
-  private def gtHeader(token: String)         =
+  private def gtHeader(token: String)                =
     Custom("x-guest-token", token)

@@ -18,6 +18,6 @@ object UtilsSpec extends ZIOSpecDefault:
           case Some(version) =>
             assertTrue(version.group(1) == "112")
           case None          =>
-            throw new Exception("Version doesn't exist in User-Agent header")
+            throw new NoSuchElementException("Version doesn't exist in User-Agent header")
       }
     )

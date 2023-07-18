@@ -35,10 +35,12 @@ trait Scraper:
     Client.request(req).provide(createClientLayer(proxy, timeout))
 
   private def createClientLayer(proxy: Proxy, timeout: Duration) =
-    val clientLayer =
+    val configWithProxy =
+      if proxy == Proxy.empty then ZClient.Config.default
+      else ZClient.Config.default.proxy(proxy)
+    val clientLayer     =
       (ZLayer.succeed(
-        ZClient.Config.default
-          .proxy(proxy)
+        configWithProxy
           .connectionTimeout(timeout)
           .addUserAgentHeader(false)
       ) ++ ZLayer.succeed(
