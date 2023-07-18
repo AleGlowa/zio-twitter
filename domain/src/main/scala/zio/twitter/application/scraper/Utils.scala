@@ -38,7 +38,7 @@ private[scraper] object TwitterUtils:
     case Top, Bottom, Both
 
   final case class GuestTokenManager(
-    token: Option[String] = None,
+    token: Option[String],
     setTime: Duration = 0.seconds
   ):
     def reset: GuestTokenManager = copy(token = None, setTime = 0.seconds)
