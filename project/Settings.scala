@@ -13,14 +13,16 @@ object Settings {
       Compile / mainClass := Some("zio.twitter.boot.Boot")
     )
 
-  val commonSettings =
+  val coreSettings =
     Seq(
       scalacOptions     :=
         Seq("-unchecked", "-deprecation", "-feature"),
       scalafixOnCompile := true,
-      testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
+      testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
+      libraryDependencies ++= zio :: zioTest :: zioTestSbt :: Nil
     )
 
-  val commonDependencies =
-    zio :: zioHttp :: zioPrelude :: zioJson :: zioTest :: zioTestSbt :: Nil
+  val domainDependencies  = zioHttp :: zioPrelude :: zioJson :: Nil
+  val commonsDependencies =
+    zioLogging :: zioConfig :: zioConfigTypesafe :: zioHttp :: Nil
 }

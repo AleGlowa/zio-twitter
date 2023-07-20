@@ -4,6 +4,8 @@ import zio.*
 import zio.http.Header.UserAgent
 import zio.http.*
 import zio.http.netty.NettyConfig
+import zio.twitter.commons.Logger.Debug.reqAnnotation
+import zio.twitter.commons.Logger.Debug.respAnnotation
 
 trait Scraper:
 
@@ -32,7 +34,11 @@ trait Scraper:
     val req                  =
       Request.default(method, url, body).addHeaders(headersWithUserAgent)
 
-    Client.request(req).provide(createClientLayer(proxy, timeout))
+    for
+      _    <- ZIO.logDebug("Making a request") @@ reqAnnotation(req)
+      resp <- Client.request(req).provide(createClientLayer(proxy, timeout))
+      _    <- ZIO.logDebug("Got a response") @@ respAnnotation(resp)
+    yield resp
 
   private def createClientLayer(proxy: Proxy, timeout: Duration) =
     val configWithProxy =
@@ -52,5 +58,8 @@ trait Scraper:
         .exponential(1.second)
         .repetitions
         .whileOutput(_ <= connRetries)
+        .tapOutput(retry =>
+          ZIO.logWarning(s"After $retry retry to make a request")
+        )
 
     clientLayer.map(_.update[Client](_.retry(scheduler)))
