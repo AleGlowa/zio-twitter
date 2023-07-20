@@ -83,13 +83,16 @@ final class TwitterSearchScraper(
       yield gt.value
 
     for
+      _        <- ZIO.logInfo("Retrieving guest token")
       gt       <-
         (ZIO.getOrFail(fromText) <> ZIO.getOrFail(fromCookie) <> fromApi)
+          .tapError(_ => ZIO.logFatal("Unable to retrieve guest token"))
           .orDieWith(_ =>
             throw new NoSuchElementException("Unable to retrieve guest token")
           )
       gtManager = GuestTokenManager(token = Some(gt))
       _        <- ZIO.setState[State](State(gtManager))
+      _        <- ZIO.logDebug(s"Using $gt guest token")
     yield gtManager
 
 object TwitterSearchScraper:
