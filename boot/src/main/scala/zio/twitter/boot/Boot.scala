@@ -14,7 +14,10 @@ object Boot extends ZIOAppDefault:
     ) >>> consoleLogger()
 
   override val run: UIO[ExitCode] =
-    (for
-      _ <- TwitterSearchScraper.getApiData(url) //ZIO.logDebug("Hello world!")
-      //_ <- ZIO.logDebug("I was compiled by Scala 3. :)")
-    yield ()).exitCode.provide(TwitterSearchScraper.layer, ZState.initial(TwitterSearchScraper.initstate))
+    (for _ <-
+        TwitterSearchScraper.getApiData(url) // ZIO.logDebug("Hello world!")
+      // _ <- ZIO.logDebug("I was compiled by Scala 3. :)")
+    yield ()).exitCode.provide(
+      TwitterSearchScraper.layer,
+      ZState.initial(TwitterSearchScraper.initstate)
+    )
