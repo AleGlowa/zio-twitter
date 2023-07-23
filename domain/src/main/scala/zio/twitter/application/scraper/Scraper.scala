@@ -8,6 +8,7 @@ import zio.twitter.commons.Logger.Debug.reqAnnotation
 import zio.twitter.commons.Logger.Debug.respAnnotation
 
 trait Scraper:
+  self =>
 
   protected val name: String
   protected val connRetries: Int = 3
@@ -15,10 +16,10 @@ trait Scraper:
   def getItems: List[String]
 
   protected def get(url: URL, headers: Headers): Task[Response] =
-    request(Method.GET, url, Body.empty, headers)
+    self.request(Method.GET, url, Body.empty, headers)
 
   protected def post(url: URL, body: Body, headers: Headers): Task[Response] =
-    request(Method.POST, url, body, headers)
+    self.request(Method.POST, url, body, headers)
 
   private def request(
     method: Method,
@@ -36,7 +37,8 @@ trait Scraper:
 
     for
       _    <- ZIO.logDebug("Making a request") @@ reqAnnotation(req)
-      resp <- Client.request(req).provide(createClientLayer(proxy, timeout))
+      resp <-
+        Client.request(req).provide(self.createClientLayer(proxy, timeout))
       _    <- ZIO.logDebug("Got a response") @@ respAnnotation(resp)
     yield resp
 
