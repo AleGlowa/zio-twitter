@@ -29,10 +29,7 @@ private[scraper] object TwitterUtils:
     )
 
   enum TwitterSearchScraperMode:
-    case Live, Top, User
-
-  enum TwitterApiType:
-    case GraphQL
+    case Live, Top
 
   enum ScrollDirection:
     case Top, Bottom, Both
